@@ -2,14 +2,12 @@
 
 This is a Streamlit app that converts images into pencil sketches. The app is dockerized so it can run anywhere easily.
 
-How We Created the Docker Image
+# How We Created the Docker Image
 
-Prepare the project folder
-
+1)Prepare the project folder
 Keep your app.py (Streamlit app) and requirements.txt (list of Python packages your app needs) in the folder.
 
-Create requirements.txt
-
+2)Create requirements.txt
 Example packages:
 
 streamlit
@@ -17,7 +15,7 @@ opencv-python
 numpy
 
 
-Write a Dockerfile
+3)Write a Dockerfile
 
 Example:
 
@@ -30,35 +28,30 @@ EXPOSE 8501
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
 
-Build the Docker image
+4)Build the Docker image
 
 docker build -t pencil-sketch-app .
 
 
-Run the app locally (optional)
+5)Run the app locally (optional)
 
 docker run -p 8501:8501 pencil-sketch-app
 
 
 Open http://localhost:8501 in your browser.
 
-Login to Docker Hub
-
+6)Login to Docker Hub
 docker login
 
 
-Tag the image
-
+7)Tag the image
 docker tag pencil-sketch-app yourdockerhubusername/pencil-sketch-app:latest
 
 
-Push to Docker Hub
-
+8)Push to Docker Hub
 docker push yourdockerhubusername/pencil-sketch-app:latest
 
 
-Check your Docker Hub
-
+9)Check your Docker Hub
 Go to your account → Repositories → Pencil Sketch App
-
 You should see your image there.
