@@ -1,79 +1,79 @@
-# Pencil-Sketch-App
+# Pencil Sketch App
 
-This is a Streamlit app that converts images into pencil sketches. The app is dockerized so it can run anywhere easily.
+A Streamlit app that turns a photo into a pencil sketch using OpenCV. It is packaged with Docker, so it runs the same way on any machine.
 
-# How We Created the Docker Image
+## Features
 
-1)Prepare the project folder
+- Upload a JPG or PNG and see the original next to the sketch
+- Adjustable sketch softness with a slider
+- Download the result as a lossless PNG
+- Handles transparent PNGs (placed on white paper), greyscale images and phone photos that carry a rotation flag
+- Very large photos are scaled down to 2000 px on the longest side to keep the app responsive
 
-Keep your app.py (Streamlit app) and requirements.txt (list of Python packages your app needs) in the folder.
+## How it works
 
+The sketch is made with the classic colour-dodge technique:
 
+1. Convert the image to greyscale
+2. Invert the greyscale image
+3. Blur the inverted image with a Gaussian blur
+4. Invert the blurred image
+5. Divide the greyscale image by the inverted blur (`cv2.divide(gray, inverted_blur, scale=256)`)
 
-2)Create requirements.txt
-Example packages:
+Dividing by the blurred negative keeps edges dark and turns flat areas white, which looks like pencil strokes on paper. A larger blur makes the shading softer and bolder.
 
-streamlit
-opencv-python
-numpy
+`pencil-sketch-app.ipynb` walks through the same pipeline step by step in Google Colab.
 
+## Run locally
 
-
-
-
-3)Write a Dockerfile
-
-Example:
-
-FROM python:3.10
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-EXPOSE 8501
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
-
-
-
-
-
-4)Build the Docker image
-
-docker build -t pencil-sketch-app .
-
-
-
-
-5)Run the app locally (optional)
-
-docker run -p 8501:8501 pencil-sketch-app
-
+```bash
+git clone https://github.com/maheshwarikalaskar/Pencil-Sketch-App.git
+cd Pencil-Sketch-App
+pip install -r requirements.txt
+streamlit run app.py
+```
 
 Open http://localhost:8501 in your browser.
 
+## Run with Docker
 
+```bash
+docker build -t pencil-sketch-app .
+docker run -p 8501:8501 pencil-sketch-app
+```
 
+Open http://localhost:8501 in your browser.
 
-6)Login to Docker Hub
+### Publish to Docker Hub
+
+```bash
 docker login
+docker tag pencil-sketch-app <dockerhub-username>/pencil-sketch-app:latest
+docker push <dockerhub-username>/pencil-sketch-app:latest
+```
 
+## Files
 
+```
+.
+├── app.py                      # Streamlit app
+├── requirements.txt
+├── Dockerfile
+├── .dockerignore
+├── pencil-sketch-app.ipynb     # step-by-step Colab notebook
+└── README.md
+```
 
+## Tech stack
 
-7)Tag the image
-docker tag pencil-sketch-app yourdockerhubusername/pencil-sketch-app:latest
+Python, Streamlit, OpenCV, NumPy, Pillow, Docker
 
+## Possible improvements
 
+- Colour pencil-sketch mode
+- Paper texture and stroke-intensity controls
+- Webcam input
 
+## Author
 
-
-8)Push to Docker Hub
-docker push yourdockerhubusername/pencil-sketch-app:latest
-
-
-
-
-
-9)Check your Docker Hub
-Go to your account → Repositories → Pencil Sketch App
-You should see your image there.
+**Maheshwari Kalaskar**: [GitHub](https://github.com/maheshwarikalaskar) · [LinkedIn](https://www.linkedin.com/in/maheshwarikalaskar/)

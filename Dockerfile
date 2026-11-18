@@ -1,23 +1,25 @@
-# Use official Python image
-FROM python:3.10-slim
+# Official slim Python image
+FROM python:3.12-slim
 
-# Install system dependencies for OpenCV
-RUN apt-get update && apt-get install -y \
+ENV PYTHONUNBUFFERED=1
+
+# System libraries OpenCV needs on a slim image
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Copy files
+# Install dependencies first so Docker can cache this layer
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app.py .
 
-# Expose port
 EXPOSE 8501
 
-# Run the app
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')" || exit 1
+
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--browser.gatherUsageStats=false"]
